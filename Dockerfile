@@ -1,19 +1,12 @@
-FROM node:boron
+FROM node:6-alpine
 
-RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
-RUN chmod +x /usr/local/bin/dumb-init
-
-# Create app directory
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-# Install app dependencies
-COPY package.json /usr/src/app/
-RUN npm install
-
-# Bundle app source
-COPY . /usr/src/app
-
+RUN mkdir -p /home/node/app \
+    && apk add --no-cache tini
+WORKDIR /home/node/app
+COPY ["package.json","./"]
+RUN npm install  \
+    && [[ -d /tmp/npm-* ]] && rm -rf /tmp/npm-*
+COPY . /home/node/app
+ENTRYPOINT ["/sbin/tini", "--"]
 EXPOSE 3000
 CMD ["npm", "start"]
-ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
