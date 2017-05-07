@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var redis = require('redis');
-redisClient = redis.createClient();
+redisClient = redis.createClient('6379', 'redis');
 
 // Routes
 app.get('/', function(req, res) {
